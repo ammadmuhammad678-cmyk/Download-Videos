@@ -1,29 +1,69 @@
-   const BACKEND_URL = 'https://ammad12.pythonanywhere.com';
+    // CORS Proxy for backup
+        const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+        const BACKEND_URL = 'https://ammad12.pythonanywhere.com';
+        
+        // Safe element selector - null check included
+        function getElement(id) {
+            const element = document.getElementById(id);
+            if (!element) {
+                console.error(`Element with id '${id}' not found`);
+            }
+            return element;
+        }
         
         // Check backend status on page load
-        window.addEventListener('load', checkBackendStatus);
+        document.addEventListener('DOMContentLoaded', function() {
+            checkBackendStatus();
+            setupEventListeners();
+        });
+        
+        function setupEventListeners() {
+            const videoUrlInput = getElement('videoUrl');
+            if (videoUrlInput) {
+                videoUrlInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        downloadVideo();
+                    }
+                });
+            }
+        }
         
         async function checkBackendStatus() {
-            const statusElement = document.getElementById('backendStatus');
+            const statusElement = getElement('backendStatus');
+            if (!statusElement) return;
             
             try {
-                const response = await fetch(`${BACKEND_URL}/status`);
-                const data = await response.json();
+                // Try direct connection first
+                let response = await fetch(`${BACKEND_URL}/status`);
+                let data = await response.json();
                 
                 statusElement.innerHTML = `✅ <strong>Backend Online:</strong> ${data.message}`;
                 statusElement.style.background = '#d4edda';
                 statusElement.style.color = '#155724';
                 
             } catch (error) {
-                statusElement.innerHTML = `❌ <strong>Backend Offline:</strong> Cannot connect to server`;
-                statusElement.style.background = '#f8d7da';
-                statusElement.style.color = '#721c24';
-                console.error('Backend check failed:', error);
+                console.log('Direct connection failed, trying CORS proxy...');
+                
+                // Try with CORS proxy
+                try {
+                    const response = await fetch(CORS_PROXY + BACKEND_URL + '/status');
+                    const data = await response.json();
+                    
+                    statusElement.innerHTML = `✅ <strong>Backend Online (via proxy):</strong> ${data.message}`;
+                    statusElement.style.background = '#d4edda';
+                    statusElement.style.color = '#155724';
+                    
+                } catch (proxyError) {
+                    statusElement.innerHTML = `❌ <strong>Backend Offline:</strong> Cannot connect to server`;
+                    statusElement.style.background = '#f8d7da';
+                    statusElement.style.color = '#721c24';
+                    console.error('Both direct and proxy connections failed:', proxyError);
+                }
             }
         }
         
         async function getVideoInfo() {
-            const videoUrl = document.getElementById('videoUrl').value.trim();
+            const videoUrl = getElement('videoUrl').value.trim();
             
             if (!videoUrl) {
                 showStatus('❌ Please enter a video URL', 'error');
@@ -34,13 +74,28 @@
             hideVideoInfo();
             
             try {
-                const response = await fetch(`${BACKEND_URL}/video_info`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ url: videoUrl })
-                });
+                let response;
+                
+                // Try direct connection first
+                try {
+                    response = await fetch(`${BACKEND_URL}/video_info`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ url: videoUrl })
+                    });
+                } catch (directError) {
+                    // If direct fails, use proxy
+                    console.log('Direct connection failed, using proxy...');
+                    response = await fetch(CORS_PROXY + BACKEND_URL + '/video_info', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ url: videoUrl })
+                    });
+                }
                 
                 const data = await response.json();
                 
@@ -58,7 +113,10 @@
         }
         
         async function downloadVideo() {
-            const videoUrl = document.getElementById('videoUrl').value.trim();
+            const videoUrlInput = getElement('videoUrl');
+            if (!videoUrlInput) return;
+            
+            const videoUrl = videoUrlInput.value.trim();
             
             if (!videoUrl) {
                 showStatus('❌ Please enter a video URL', 'error');
@@ -70,14 +128,30 @@
             hideDownloadLink();
             
             try {
-                const response = await fetch(`${BACKEND_URL}/download`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ url: videoUrl })
-                });
+                let response;
+                
+                // Try direct connection first
+                try {
+                    response = await fetch(`${BACKEND_URL}/download`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ url: videoUrl })
+                    });
+                } catch (directError) {
+                    // If direct fails, use proxy
+                    console.log('Direct connection failed, using proxy...');
+                    response = await fetch(CORS_PROXY + BACKEND_URL + '/download', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ url: videoUrl })
+                    });
+                }
                 
                 const data = await response.json();
                 
@@ -111,21 +185,13 @@
                     clearInterval(interval);
                 }
                 showProgress(progress);
-                
-                // In real implementation, you would check actual progress from backend
-                // try {
-                //     const progressResponse = await fetch(`${BACKEND_URL}/progress/${filename}`);
-                //     const progressData = await progressResponse.json();
-                //     showProgress(progressData.progress);
-                // } catch (e) {
-                //     console.log('Progress check failed');
-                // }
-                
             }, 500);
         }
         
         function showVideoInfo(info) {
-            const videoInfoDiv = document.getElementById('videoInfo');
+            const videoInfoDiv = getElement('videoInfo');
+            if (!videoInfoDiv) return;
+            
             const duration = formatDuration(info.duration);
             
             videoInfoDiv.innerHTML = `
@@ -137,55 +203,72 @@
                 <p><strong>Available Formats:</strong> ${info.formats}</p>
                 ${info.description ? `<p><strong>Description:</strong> ${info.description}</p>` : ''}
             `;
-            videoInfoDiv.style.display = 'block';
+            videoInfoDiv.classList.remove('hidden');
         }
         
         function hideVideoInfo() {
-            document.getElementById('videoInfo').style.display = 'none';
+            const videoInfoDiv = getElement('videoInfo');
+            if (videoInfoDiv) {
+                videoInfoDiv.classList.add('hidden');
+            }
         }
         
         function showProgress(percent) {
-            const progressContainer = document.getElementById('progressContainer');
-            const progressBar = document.getElementById('progress');
-            const progressText = document.getElementById('progressText');
+            const progressContainer = getElement('progressContainer');
+            const progressBar = getElement('progress');
+            const progressText = getElement('progressText');
             
-            progressContainer.style.display = 'block';
+            if (!progressContainer || !progressBar || !progressText) return;
+            
+            progressContainer.classList.remove('hidden');
             progressBar.style.width = percent + '%';
             progressText.textContent = Math.round(percent) + '%';
             
-            // Update download speed (simulated)
-            const speedElement = document.getElementById('downloadSpeed');
-            if (percent < 100) {
-                const speed = Math.random() * 2 + 1; // Random speed between 1-3 MB/s
-                speedElement.textContent = speed.toFixed(1) + ' MB/s';
-            } else {
-                speedElement.textContent = 'Completed';
+            const speedElement = getElement('downloadSpeed');
+            if (speedElement) {
+                if (percent < 100) {
+                    const speed = Math.random() * 2 + 1;
+                    speedElement.textContent = speed.toFixed(1) + ' MB/s';
+                } else {
+                    speedElement.textContent = 'Completed';
+                }
             }
         }
         
         function hideProgress() {
-            document.getElementById('progressContainer').style.display = 'none';
+            const progressContainer = getElement('progressContainer');
+            if (progressContainer) {
+                progressContainer.classList.add('hidden');
+            }
         }
         
         function showDownloadLink(data) {
-            const downloadLinkDiv = document.getElementById('downloadLink');
+            const downloadLinkDiv = getElement('downloadLink');
+            if (!downloadLinkDiv) return;
+            
             downloadLinkDiv.innerHTML = `
                 <a href="${BACKEND_URL}${data.download_url}" class="download-btn" download>
                     📥 Download "${data.title}" 
                     ${data.file_size ? `(${(data.file_size / (1024*1024)).toFixed(1)} MB)` : ''}
                 </a>
             `;
-            downloadLinkDiv.style.display = 'block';
+            downloadLinkDiv.classList.remove('hidden');
         }
         
         function hideDownloadLink() {
-            document.getElementById('downloadLink').style.display = 'none';
+            const downloadLinkDiv = getElement('downloadLink');
+            if (downloadLinkDiv) {
+                downloadLinkDiv.classList.add('hidden');
+            }
         }
         
         function showStatus(message, type) {
-            const statusDiv = document.getElementById('status');
+            const statusDiv = getElement('status');
+            if (!statusDiv) return;
+            
             statusDiv.textContent = message;
             statusDiv.className = `status ${type}`;
+            statusDiv.classList.remove('hidden');
         }
         
         function formatDuration(seconds) {
@@ -201,10 +284,3 @@
                 return `${minutes}:${secs.toString().padStart(2, '0')}`;
             }
         }
-        
-        // Enter key support
-        document.getElementById('videoUrl').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                downloadVideo();
-            }
-        });
