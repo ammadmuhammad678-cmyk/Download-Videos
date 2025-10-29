@@ -6,26 +6,15 @@ import time
 
 app = Flask(__name__)
 
-# CORS setup for GitHub Pages
-CORS(app, resources={
-    r"/*": {
-        "origins": [
-            "https://ammadmuhammad678-cmyk.github.io",
-            "http://ammadmuhammad678-cmyk.github.io",
-            "https://ammad12.pythonanywhere.com"
-        ],
-        "methods": ["GET", "POST", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"]
-    }
-})
+# CORS setup - Allow all origins for testing
+CORS(app)
 
-# Manual CORS headers bhi add karein
+# Manual CORS headers
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', 'https://ammadmuhammad678-cmyk.github.io')
+    response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
 
 # PythonAnywhere pe safe path
@@ -139,7 +128,6 @@ def status():
         'cors_enabled': True
     })
 
-# Simple test endpoint
 @app.route('/test', methods=['GET'])
 def test():
     return jsonify({'message': 'CORS test successful!', 'status': 'working'})
