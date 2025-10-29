@@ -1,0 +1,430 @@
+ *{
+           margin: 0;
+           padding: 0;
+           box-sizing: border-box;
+           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        html, body {
+          overflow-x: hidden;
+        }
+        body{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .heading{
+            margin-top: 30px;
+            justify-content: center;
+            text-align: center;
+        }
+        .heading h1{
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .heading h5{
+            font-size: 1.3rem;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        .deo {
+          display: flex;
+          justify-content: center; 
+          align-items: center;  
+          margin-top: 50px;   
+        }
+
+        .Download-section {
+          width: 750px;  
+          height: 450px;         
+          background: rgba(255, 255, 255, 0.95);
+          border-radius: 16px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+          text-align: center;    
+          backdrop-filter: blur(10px);
+        }
+        .hero{
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            margin-top: 80px;
+            gap: 30px;
+        }
+        .hero h3{
+            font-size: 28px;
+            color: #333;
+        }
+        .hero i{
+            color: #4CAF50;
+        }
+        .hero input{
+            width: 500px;
+            height: 50px;
+            font-size: 16px;
+            padding: 0 20px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        .hero input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+        .icon{
+            display: flex;
+            justify-content: center;
+            gap: 45px;
+        }
+        .social h4{
+            font-size: 13px;
+            color: #333;
+        }
+        .social i{
+            font-size: 28px;
+        }
+        .social .fa-tiktok{
+            color: black;
+        }
+        .social .fa-facebook{
+            color: #1877F2;
+        }
+        .social .fa-youtube{
+            color: #FF0000;
+        }
+        .social .fa-instagram{
+             background: radial-gradient(circle at 30% 107%, 
+            #fdf497 0%, 
+            #fdf497 5%, 
+            #fd5949 45%, 
+            #d6249f 60%, 
+            #285AEB 90%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        button {
+            width: 500px;
+            height: 50px;
+            font-size: 18px;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        button .fa-download{
+            color: white;
+        }
+
+        .Download-section1{
+          width: 750px;  
+          margin-top: 80px;
+          height: 450px;         
+          background: rgba(255, 255, 255, 0.95);
+          border-radius: 16px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .enter h1{
+            position: relative;
+            top: 40px;
+            text-align: center;
+            color: #333;
+            font-size: 2rem;
+        }
+
+        .her{
+            display: flex;
+            margin-top: 100px;
+            margin-left: 30px;
+            gap: 30px;
+            /* margin: auto; */
+            flex-wrap: wrap;
+        }
+        .ico{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 150px;
+        }
+
+        .her .ico i{
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+        .ico .fa-tiktok{
+            color: black;
+        }
+        .ico .fa-facebook{
+            color: #1877F2;
+        }
+        .ico .fa-youtube{
+            color: #FF0000;
+        }
+        .ico .fa-instagram{
+             background: radial-gradient(circle at 30% 107%, 
+            #fdf497 0%, 
+            #fdf497 5%, 
+            #fd5949 45%, 
+            #d6249f 60%, 
+            #285AEB 90%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .head h4, p {
+          text-align: center;
+          color: #333;
+        }
+        .head h4 {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        .head p {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .head{
+            padding: 0 10px;
+        }
+
+        .notice-container{
+          width: 750px;  
+          margin-top: 50px;
+          background: rgba(255, 255, 255, 0.95);
+          border-radius: 16px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .notice-container .not{
+            display: flex;
+            padding: 25px;
+            align-items: flex-start;
+        }
+        .not i{
+            font-size: 30px;
+            color: #FF9800;
+            margin-right: 15px;
+        }
+        .not p{
+            padding: 0 10px;
+            color: #333;
+            text-align: left;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Progress bar styles */
+        .progress-container {
+            width: 500px;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 10px 0;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast.success {
+            background: #4CAF50;
+        }
+        .toast.error {
+            background: #f44336;
+        }
+
+        /* Download info */
+        .download-info {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            background: #e8f5e8;
+            border-radius: 8px;
+            border: 1px solid #4CAF50;
+        }
+        .download-info p {
+            color: #2e7d32;
+            text-align: center;
+            margin: 5px 0;
+        }
+        .download-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 992px) {
+          .Download-section,
+          .Download-section1,
+          .notice-container {
+            width: 90%;
+            height: auto;
+            padding: 20px;
+          }
+
+          .hero input,
+          button,
+          .progress-container {
+            width: 90%;
+          }
+
+          .icon {
+            flex-wrap: wrap;
+            gap: 30px;
+          }
+
+          .her {
+            flex-wrap: wrap;
+            gap: 60px;
+            justify-content: center;
+            margin-left: 0;
+          }
+
+          .head h4, .head p {
+            font-size: 16px;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .heading h1 {
+            font-size: 2rem;
+          }
+
+          .heading h5 {
+            font-size: 1rem;
+          }
+
+          .hero {
+            margin-top: 40px;
+            gap: 25px;
+          }
+
+          .hero h3 {
+            font-size: 1.5rem;
+          }
+
+          .hero input {
+            width: 90%;
+            height: 45px;
+            font-size: 14px;
+          }
+
+          button {
+            width: 90%;
+            height: 45px;
+            font-size: 16px;
+          }
+
+          .progress-container {
+            width: 90%;
+          }
+
+          .icon {
+            flex-wrap: wrap;
+            gap: 25px;
+          }
+
+          .social h4 {
+            font-size: 12px;
+          }
+
+          .her {
+            flex-direction: column;
+            align-items: center;
+            margin-top: 60px;
+            gap: 40px;
+          }
+
+          .ico {
+            flex-direction: row;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+            gap: 15px;
+          }
+
+          .ico i {
+            font-size: 28px;
+            margin-bottom: 0;
+          }
+
+          .head {
+            text-align: left;
+          }
+
+          .head h4 {
+            font-size: 16px;
+          }
+
+          .head p {
+            font-size: 13px;
+            text-align: left;
+          }
+
+          .notice-container {
+            width: 90%;
+            margin: 30px auto;
+          }
+
+          .not {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .not p {
+            font-size: 14px;
+            padding: 10px 0 0 0;
+          }
+        }
