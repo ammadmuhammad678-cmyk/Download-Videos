@@ -1,7 +1,5 @@
-// Backend API URL - PythonAnywhere
-
+// CORS PROXY SOLUTION - IMMEDIATE FIX
 const API_BASE = 'https://corsproxy.io/?' + encodeURIComponent('https://ammad12.pythonanywhere.com');
-const API_BASE = 'https://ammad12.pythonanywhere.com';
 
 // Elements select kar rahe hain
 const input = document.querySelector(".hero-input");
@@ -50,41 +48,6 @@ function animateProgress(duration = 3000) {
     return interval;
 }
 
-// Check download status
-async function checkDownloadStatus(downloadId) {
-    try {
-        const response = await fetch(`${API_BASE}/download_status/${downloadId}`);
-        const data = await response.json();
-        
-        if (data.success) {
-            // Download completed
-            clearInterval(statusCheckInterval);
-            progressBar.style.width = '100%';
-            
-            showToast(`✅ Download completed!`, "success");
-            
-            // Show download info
-            downloadMessage.textContent = `Downloaded: ${data.title}`;
-            downloadLink.href = `${API_BASE}/get_file/${encodeURIComponent(data.filename)}`;
-            downloadLink.style.display = 'inline-block';
-            downloadInfo.style.display = 'block';
-            
-            input.placeholder = "✅ Download complete! Paste another URL";
-            input.style.border = "2px solid #4CAF50";
-            button.disabled = false;
-            
-        } else if (data.error) {
-            // Download failed
-            clearInterval(statusCheckInterval);
-            showToast(`❌ Download failed: ${data.error}`, "error");
-            resetForm();
-        }
-        
-    } catch (error) {
-        console.error('Status check error:', error);
-    }
-}
-
 // Reset form
 function resetForm() {
     input.style.border = "2px solid #ddd";
@@ -96,20 +59,15 @@ function resetForm() {
     button.disabled = false;
 }
 
-let statusCheckInterval = null;
-
 // Download video function
 async function downloadVideo() {
     const url = input.value.trim();
 
-    // Agar input khaali hai
     if (url === "") {
         showToast("⚠️ Please paste a video URL!", "error");
-        input.focus();
         return;
     }
 
-    // Validate URL format
     try {
         new URL(url);
     } catch (_) {
@@ -117,80 +75,40 @@ async function downloadVideo() {
         return;
     }
 
-    // First check if backend is reachable
-    try {
-        const statusResponse = await fetch(`${API_BASE}/status`);
-        if (!statusResponse.ok) {
-            throw new Error('Backend server not responding');
-        }
-    } catch (error) {
-        showToast("🔴 Backend server not reachable. Please try again later.", "error");
-        return;
-    }
-
-    // UI setup for download
     input.style.border = "2px solid #4CAF50";
     input.style.color = "#4CAF50";
     input.placeholder = "🚀 Starting download...";
     button.disabled = true;
     
-    // Show progress
-    const progressInterval = animateProgress();
+    animateProgress();
     
     try {
-        console.log("⚡ Starting download...");
-        
-        // Start download
         const response = await fetch(`${API_BASE}/download`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ 
-                url: url
-            })
+            body: JSON.stringify({ url: url })
         });
         
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
         const data = await response.json();
-        console.log("📨 Download started:", data);
         
         if (data.success) {
-            showToast("🚀 Download started...", "success");
-            
-            // Start checking download status every 3 seconds
-            statusCheckInterval = setInterval(() => {
-                checkDownloadStatus(data.download_id);
-            }, 3000);
-            
-            // Update UI
-            input.placeholder = "⏳ Download in progress...";
-            
+            showToast("✅ Download started successfully!", "success");
+            downloadMessage.textContent = `Downloading: ${data.title || 'video'}`;
+            downloadInfo.style.display = 'block';
+            input.placeholder = "✅ Download complete! Paste another URL";
         } else {
-            throw new Error(data.error || 'Failed to start download');
+            throw new Error(data.error);
         }
         
     } catch (error) {
-        console.error('❌ Download error:', error);
-        
-        let errorMessage = 'Download failed: ';
-        if (error.message.includes('Failed to fetch')) {
-            errorMessage = 'Cannot connect to server. Please check your internet connection.';
-        } else if (error.message.includes('500')) {
-            errorMessage = 'Server error. Please try again later.';
-        } else {
-            errorMessage += error.message;
-        }
-        
-        showToast(errorMessage, "error");
+        console.error('Download error:', error);
+        showToast("❌ Download failed. Backend issue.", "error");
         input.placeholder = "❌ Download failed";
         input.style.border = "2px solid red";
         input.style.color = "red";
         
-        // Reset after 5 seconds
         setTimeout(() => {
             resetForm();
         }, 5000);
@@ -204,11 +122,11 @@ async function checkBackend() {
         if (response.ok) {
             const data = await response.json();
             console.log('✅ Backend connected:', data);
-            showToast("🌐 Connected to online server!", "success");
+            showToast("🌐 Connected to server!", "success");
         }
     } catch (error) {
         console.warn('❌ Backend not connected:', error);
-        showToast("⚠️ Backend server not available", "error");
+        showToast("⚠️ Server connection issue", "error");
     }
 }
 
@@ -225,7 +143,6 @@ input.addEventListener('blur', () => {
     }
 });
 
-// Enter key support
 input.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         downloadVideo();
@@ -233,14 +150,4 @@ input.addEventListener('keypress', (e) => {
 });
 
 // Initialize
-window.addEventListener('load', () => {
-    checkBackend();
-});
-
-// Cleanup on page unload
-window.addEventListener('beforeunload', () => {
-    if (statusCheckInterval) {
-        clearInterval(statusCheckInterval);
-    }
-});
-
+window.addEventListener('load', checkBackend);
