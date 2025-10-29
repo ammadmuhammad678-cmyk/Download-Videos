@@ -93,3 +93,4 @@ input.addEventListener('keypress', (e) => {
 
 // Initialize
 window.addEventListener('load', checkBackend);
+
