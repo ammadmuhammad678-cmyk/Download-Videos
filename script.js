@@ -1,4 +1,8 @@
 // Elements select kar rahe hain
+// Backend API URL - PythonAnywhere
+const API_BASE = 'https://ammad12.pythonanywhere.com';
+
+// Elements select kar rahe hain
 const input = document.querySelector(".hero-input");
 const button = document.getElementById("download-btn");
 const progressContainer = document.getElementById("progressContainer");
@@ -7,6 +11,8 @@ const toast = document.getElementById("toast");
 const downloadInfo = document.getElementById("downloadInfo");
 const downloadMessage = document.getElementById("downloadMessage");
 const downloadLink = document.getElementById("downloadLink");
+
+// Rest of your code...
 
 // Backend API URL - PythonAnywhere
 const API_BASE = 'https://ammad12.pythonanywhere.com';
@@ -236,3 +242,4 @@ window.addEventListener('beforeunload', () => {
         clearInterval(statusCheckInterval);
     }
 });
+
