@@ -1,4 +1,3 @@
-// Elements select kar rahe hain
 // Backend API URL - PythonAnywhere
 const API_BASE = 'https://ammad12.pythonanywhere.com';
 
@@ -11,11 +10,6 @@ const toast = document.getElementById("toast");
 const downloadInfo = document.getElementById("downloadInfo");
 const downloadMessage = document.getElementById("downloadMessage");
 const downloadLink = document.getElementById("downloadLink");
-
-// Rest of your code...
-
-// Backend API URL - PythonAnywhere
-const API_BASE = 'https://ammad12.pythonanywhere.com';
 
 // Toast notification function
 function showToast(message, type = "info") {
@@ -83,7 +77,6 @@ async function checkDownloadStatus(downloadId) {
             showToast(`❌ Download failed: ${data.error}`, "error");
             resetForm();
         }
-        // Else still processing, continue checking
         
     } catch (error) {
         console.error('Status check error:', error);
@@ -180,7 +173,6 @@ async function downloadVideo() {
         
     } catch (error) {
         console.error('❌ Download error:', error);
-        clearInterval(progressInterval);
         
         let errorMessage = 'Download failed: ';
         if (error.message.includes('Failed to fetch')) {
@@ -192,7 +184,14 @@ async function downloadVideo() {
         }
         
         showToast(errorMessage, "error");
-        resetForm();
+        input.placeholder = "❌ Download failed";
+        input.style.border = "2px solid red";
+        input.style.color = "red";
+        
+        // Reset after 5 seconds
+        setTimeout(() => {
+            resetForm();
+        }, 5000);
     }
 }
 
@@ -207,7 +206,7 @@ async function checkBackend() {
         }
     } catch (error) {
         console.warn('❌ Backend not connected:', error);
-        showToast("⚠️ Using online server - some features may be limited", "error");
+        showToast("⚠️ Backend server not available", "error");
     }
 }
 
@@ -242,4 +241,3 @@ window.addEventListener('beforeunload', () => {
         clearInterval(statusCheckInterval);
     }
 });
-
