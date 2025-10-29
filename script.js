@@ -8,8 +8,8 @@ const downloadInfo = document.getElementById("downloadInfo");
 const downloadMessage = document.getElementById("downloadMessage");
 const downloadLink = document.getElementById("downloadLink");
 
-// Backend API URL
-const API_BASE = 'http://localhost:5000';
+// Backend API URL - PythonAnywhere
+const API_BASE = 'https://ammad12.pythonanywhere.com';
 
 // Toast notification function
 function showToast(message, type = "info") {
@@ -26,7 +26,7 @@ function showToast(message, type = "info") {
     
     setTimeout(() => {
         toast.classList.remove("show");
-    }, 5000); // 5 seconds for error messages
+    }, 5000);
 }
 
 // Progress bar animation
@@ -36,13 +36,52 @@ function animateProgress(duration = 3000) {
     
     let width = 0;
     const interval = setInterval(() => {
-        if (width >= 100) {
+        if (width >= 90) {
             clearInterval(interval);
         } else {
-            width += 1;
+            width += Math.random() * 10;
+            if (width > 90) width = 90;
             progressBar.style.width = width + '%';
         }
-    }, duration / 100);
+    }, 500);
+    
+    return interval;
+}
+
+// Check download status
+async function checkDownloadStatus(downloadId) {
+    try {
+        const response = await fetch(`${API_BASE}/download_status/${downloadId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            // Download completed
+            clearInterval(statusCheckInterval);
+            progressBar.style.width = '100%';
+            
+            showToast(`✅ Download completed!`, "success");
+            
+            // Show download info
+            downloadMessage.textContent = `Downloaded: ${data.title}`;
+            downloadLink.href = `${API_BASE}/get_file/${encodeURIComponent(data.filename)}`;
+            downloadLink.style.display = 'inline-block';
+            downloadInfo.style.display = 'block';
+            
+            input.placeholder = "✅ Download complete! Paste another URL";
+            input.style.border = "2px solid #4CAF50";
+            button.disabled = false;
+            
+        } else if (data.error) {
+            // Download failed
+            clearInterval(statusCheckInterval);
+            showToast(`❌ Download failed: ${data.error}`, "error");
+            resetForm();
+        }
+        // Else still processing, continue checking
+        
+    } catch (error) {
+        console.error('Status check error:', error);
+    }
 }
 
 // Reset form
@@ -56,22 +95,16 @@ function resetForm() {
     button.disabled = false;
 }
 
-// Download video function - UPDATED
+let statusCheckInterval = null;
+
+// Download video function
 async function downloadVideo() {
     const url = input.value.trim();
 
     // Agar input khaali hai
     if (url === "") {
-        input.value = "";
-        input.placeholder = "⚠️ Please paste a video URL!";
-        input.style.border = "2px solid red";
-        input.style.color = "red";
-
-        setTimeout(() => {
-            resetForm();
-        }, 2000);
-
-        showToast("Please enter a video URL", "error");
+        showToast("⚠️ Please paste a video URL!", "error");
+        input.focus();
         return;
     }
 
@@ -79,101 +112,81 @@ async function downloadVideo() {
     try {
         new URL(url);
     } catch (_) {
-        input.style.border = "2px solid red";
-        input.style.color = "red";
-        showToast("Please enter a valid URL", "error");
+        showToast("❌ Please enter a valid URL", "error");
         return;
     }
 
-    // Agar URL valid hai
+    // First check if backend is reachable
+    try {
+        const statusResponse = await fetch(`${API_BASE}/status`);
+        if (!statusResponse.ok) {
+            throw new Error('Backend server not responding');
+        }
+    } catch (error) {
+        showToast("🔴 Backend server not reachable. Please try again later.", "error");
+        return;
+    }
+
+    // UI setup for download
     input.style.border = "2px solid #4CAF50";
     input.style.color = "#4CAF50";
-    input.placeholder = "✅ Processing...";
+    input.placeholder = "🚀 Starting download...";
     button.disabled = true;
     
     // Show progress
-    animateProgress();
+    const progressInterval = animateProgress();
     
     try {
-        console.log("🔄 Sending request to backend...");
+        console.log("⚡ Starting download...");
         
-        // Backend API call with timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 seconds timeout
-        
+        // Start download
         const response = await fetch(`${API_BASE}/download`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ url: url }),
-            signal: controller.signal
+            body: JSON.stringify({ 
+                url: url
+            })
         });
-        
-        clearTimeout(timeoutId);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log("📨 Response received:", data);
+        console.log("📨 Download started:", data);
         
         if (data.success) {
-            showToast(`Successfully downloaded from ${data.platform}`, "success");
+            showToast("🚀 Download started...", "success");
             
-            // Show download info
-            downloadMessage.textContent = `Downloaded: ${data.title}`;
-            downloadLink.href = `${API_BASE}/get_file/${encodeURIComponent(data.filename)}`;
-            downloadLink.style.display = 'inline-block';
-            downloadInfo.style.display = 'block';
+            // Start checking download status every 3 seconds
+            statusCheckInterval = setInterval(() => {
+                checkDownloadStatus(data.download_id);
+            }, 3000);
             
-            input.placeholder = "✅ Download complete! Paste another URL";
-            input.style.border = "2px solid #4CAF50";
+            // Update UI
+            input.placeholder = "⏳ Download in progress...";
+            
         } else {
-            throw new Error(data.error || 'Unknown error occurred');
+            throw new Error(data.error || 'Failed to start download');
         }
         
     } catch (error) {
         console.error('❌ Download error:', error);
+        clearInterval(progressInterval);
         
         let errorMessage = 'Download failed: ';
-        
-        if (error.name === 'AbortError') {
-            errorMessage += 'Request timeout. The download is taking too long.';
-        } else if (error.message.includes('Failed to fetch')) {
-            errorMessage += 'Cannot connect to server. Make sure backend is running on port 5000.';
-        } else if (error.message.includes('Connection reset')) {
-            errorMessage += 'Connection lost. Server might have crashed. Check backend terminal.';
+        if (error.message.includes('Failed to fetch')) {
+            errorMessage = 'Cannot connect to server. Please check your internet connection.';
+        } else if (error.message.includes('500')) {
+            errorMessage = 'Server error. Please try again later.';
         } else {
             errorMessage += error.message;
         }
         
         showToast(errorMessage, "error");
-        input.placeholder = "❌ Download failed. Try again.";
-        input.style.border = "2px solid red";
-        input.style.color = "red";
-        
-        // Reset after 5 seconds
-        setTimeout(() => {
-            resetForm();
-        }, 5000);
-    }
-}
-
-// Test backend connection
-async function testBackendConnection() {
-    try {
-        console.log("🔍 Testing backend connection...");
-        const response = await fetch(`${API_BASE}/test`);
-        if (response.ok) {
-            const data = await response.json();
-            console.log("✅ Backend test successful:", data);
-            return true;
-        }
-    } catch (error) {
-        console.error("❌ Backend test failed:", error);
-        return false;
+        resetForm();
     }
 }
 
@@ -183,21 +196,18 @@ async function checkBackend() {
         const response = await fetch(`${API_BASE}/status`);
         if (response.ok) {
             const data = await response.json();
-            console.log('✅ Backend is connected:', data);
-            showToast("Backend server connected!", "success");
-            return true;
+            console.log('✅ Backend connected:', data);
+            showToast("🌐 Connected to online server!", "success");
         }
     } catch (error) {
-        console.warn('❌ Backend is not running:', error);
-        showToast("Backend server not found. Please start the Flask server on port 5000.", "error");
-        return false;
+        console.warn('❌ Backend not connected:', error);
+        showToast("⚠️ Using online server - some features may be limited", "error");
     }
 }
 
-// Button click hone par ye chalega
+// Event listeners
 button.addEventListener("click", downloadVideo);
 
-// Input field focus effect
 input.addEventListener('focus', () => {
     input.style.border = "2px solid #4CAF50";
 });
@@ -215,9 +225,14 @@ input.addEventListener('keypress', (e) => {
     }
 });
 
-// Check backend status on page load
-window.addEventListener('load', async () => {
-    console.log("🚀 Frontend loaded, checking backend...");
-    await checkBackend();
-    await testBackendConnection();
+// Initialize
+window.addEventListener('load', () => {
+    checkBackend();
+});
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (statusCheckInterval) {
+        clearInterval(statusCheckInterval);
+    }
 });
