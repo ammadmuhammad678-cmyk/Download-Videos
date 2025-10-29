@@ -1,119 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link
-      rel="icon"
-      type="image/x-icon"
-      href="https://cdn-icons-png.flaticon.com/512/724/724933.png"/>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Downloader | Download Videos from Multiple Platforms</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-</head>
+    <title>Advanced Video Downloader</title>
+    </head>
 <body>
     <div class="container">
-        <div class="heading">
-            <h1>Video Downloader</h1>
-            <h5>Download videos from multiple platforms in high quality</h5>
+        <div class="header">
+            <h1>🎬 Video Downloader</h1>
+            <p>Download videos from YouTube, Facebook, Instagram and more!</p>
         </div>
-
-        <div class="deo">
-            <div class="Download-section">
-                <div class="hero">
-                    <h3><i class="fas fa-video"></i> Paste Video URL</h3>
-                    <input type="text" class="hero-input" placeholder="Paste TikTok, Instagram, YouTube, or Facebook URL here">
-                    
-                    <div class="progress-container" id="progressContainer">
-                        <div class="progress-bar" id="progressBar"></div>
-                    </div>
-                    
-                    <button id="download-btn">
-                        <i class="fas fa-download"></i> Download Video
-                    </button>
-                    
-                    <div class="download-info" id="downloadInfo">
-                        <p id="downloadMessage"></p>
-                        <a href="#" id="downloadLink" class="download-link" style="display: none;">
-                            <i class="fas fa-download"></i> Download File
-                        </a>
-                    </div>
-                    
-                    <div class="icon">
-                        <div class="social">
-                            <i class="fab fa-tiktok"></i>
-                            <h4>TikTok</h4>
-                        </div>
-                        <div class="social">
-                            <i class="fab fa-facebook"></i>
-                            <h4>Facebook</h4>
-                        </div>
-                        <div class="social">
-                            <i class="fab fa-youtube"></i>
-                            <h4>YouTube</h4>
-                        </div>
-                        <div class="social">
-                            <i class="fab fa-instagram"></i>
-                            <h4>Instagram</h4>
-                        </div>
-                    </div>
+        
+        <div class="content">
+            <div class="input-group">
+                <label for="videoUrl">Enter Video URL:</label>
+                <input 
+                    type="text" 
+                    id="videoUrl" 
+                    class="url-input" 
+                    placeholder="https://www.youtube.com/watch?v=..." 
+                />
+            </div>
+            
+            <div class="backend-status" id="backendStatus">
+                🔄 Checking backend status...
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="getVideoInfo()">
+                    📊 Get Video Info
+                </button>
+                <button class="btn btn-secondary" onclick="downloadVideo()">
+                    ⬇️ Download Video
+                </button>
+            </div>
+            
+            <div id="status" class="status hidden"></div>
+            
+            <div id="videoInfo" class="video-info hidden"></div>
+            
+            <div id="progressContainer" class="progress-container hidden">
+                <h3>Download Progress</h3>
+                <div class="progress-bar">
+                    <div id="progress" class="progress"></div>
+                </div>
+                <div class="progress-info">
+                    <span id="progressText">0%</span>
+                    <span id="downloadSpeed">0 KB/s</span>
                 </div>
             </div>
-        </div>
-
-        <div class="deo">
-            <div class="Download-section1">
-                <div class="enter">
-                    <h1>How to Download Videos</h1>
-                </div>
-                <div class="her">
-                    <div class="ico">
-                        <i class="fab fa-tiktok"></i>
-                        <div class="head">
-                            <h4>TikTok Videos</h4>
-                            <p>Copy the TikTok video link and paste it above to download.</p>
-                        </div>
-                    </div>
-                    <div class="ico">
-                        <i class="fab fa-facebook"></i>
-                        <div class="head">
-                            <h4>Facebook Videos</h4>
-                            <p>Copy the Facebook video URL and paste it in the input field.</p>
-                        </div>
-                    </div>
-                    <div class="ico">
-                        <i class="fab fa-youtube"></i>
-                        <div class="head">
-                            <h4>YouTube Videos</h4>
-                            <p>Simply paste the YouTube video link to download.</p>
-                        </div>
-                    </div>
-                    <div class="ico">
-                        <i class="fab fa-instagram"></i>
-                        <div class="head">
-                            <h4>Instagram Videos</h4>
-                            <p>Copy Instagram video link and paste it to download.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="deo">
-            <div class="notice-container">
-                <div class="not">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <p>
-                        <strong>Important Notice:</strong> This service is for personal use only. 
-                        Please respect copyright laws and only download videos that you have 
-                        permission to use. We are not responsible for any misuse of this service.
-                    </p>
-                </div>
-            </div>
+            
+            <div id="downloadLink" class="download-link hidden"></div>
         </div>
     </div>
-
-    <div class="toast" id="toast"></div>
-    <script src="script.js"></script>
 </body>
 </html>
