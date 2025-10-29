@@ -1,4 +1,6 @@
 // Backend API URL - PythonAnywhere
+
+const API_BASE = 'https://corsproxy.io/?' + encodeURIComponent('https://ammad12.pythonanywhere.com');
 const API_BASE = 'https://ammad12.pythonanywhere.com';
 
 // Elements select kar rahe hain
@@ -241,3 +243,4 @@ window.addEventListener('beforeunload', () => {
         clearInterval(statusCheckInterval);
     }
 });
+
